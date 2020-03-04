@@ -57,17 +57,29 @@
 #define EEPROM_ITEM_STATE_ID 2 //begin of check item
 #define EEPROM_PERSON_ID 1
 
-#define HC595_LAMP_1_ON 0x01
-#define HC595_LAMP_2_ON 0x02
-#define HC595_LAMP_3_ON 0x04
-#define HC595_LAMP_4_ON 0x08
-#define HC595_LAMP_5_ON 0x10
-#define HC595_LAMP_6_ON 0x20
-#define HC595_LAMP_7_ON 0x40
-#define HC595_LAMP_8_ON 0x80
-#define HC595_LAMP_9_ON 0x0100
-#define HC595_LAMP_10_ON 0x0200
-#define HC595_ALL_LAMP_OFF 0x00
+// #define HC595_LAMP_1_ON 0x01
+// #define HC595_LAMP_2_ON 0x02
+// #define HC595_LAMP_3_ON 0x04
+// #define HC595_LAMP_4_ON 0x08
+// #define HC595_LAMP_5_ON 0x10
+// #define HC595_LAMP_6_ON 0x20
+// #define HC595_LAMP_7_ON 0x40
+// #define HC595_LAMP_8_ON 0x80
+// #define HC595_LAMP_9_ON 0x0100
+// #define HC595_LAMP_10_ON 0x0200
+// #define HC595_ALL_LAMP_OFF 0x00
+
+#define HC595_LAMP_1_ON 0xFFFE
+#define HC595_LAMP_2_ON 0xFFFD
+#define HC595_LAMP_3_ON 0xFFFB
+#define HC595_LAMP_4_ON 0xFFF7
+#define HC595_LAMP_5_ON 0xFFEF
+#define HC595_LAMP_6_ON 0xFFDF
+#define HC595_LAMP_7_ON 0xFFBF
+#define HC595_LAMP_8_ON 0xFF7F
+#define HC595_LAMP_9_ON 0xFEFF
+#define HC595_LAMP_10_ON 0xFDFF
+#define HC595_ALL_LAMP_OFF 0xFFFF
 
 const uint16_t LAMP_STATE[] = {
 	HC595_LAMP_1_ON,
@@ -137,7 +149,7 @@ void HC595_shift(uint8_t shift_reg, uint8_t type)
 		OutPut_Pin(HC595_SCK_PIN[type], LOW);
 		shift_reg = shift_reg << 1;
 	}
-}
+} 
 
 void HC595_shiftByte(uint8_t shift_reg, uint8_t type)
 {

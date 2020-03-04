@@ -52,7 +52,7 @@ typedef enum ECheckItem_Def
 
 typedef enum ECheckNote_Def
 {
- DURTY,
+ DURTY=1,
  HIGH_TEMPERERTURE,
  _1,
  _2,
@@ -307,6 +307,16 @@ typedef struct ECheckStation_t
   seting_up(id);
  }
 
+ void reset_all_check_items()
+ {
+  printf("Reset all items\r\n");
+  for (size_t i = 0; i < ECheckItems.size(); i++)
+  {
+    ECheckItems[i].Status = OK;
+  }
+
+ }
+
  void EEPROM_save_area_id()
  {
   printf("Save devie id to EEPROM\r\n");
@@ -372,14 +382,14 @@ typedef struct ECheckStation_t
 };
 
 uint8_t SelectItemLampVal[8]{
- 0x01,
- 0x02,
- 0x04,
- 0x08,
- 0x10,
- 0x20,
- 0x40,
- 0x80,
+ 0xFFFE,
+ 0xFFFD,
+ 0xFFFB,
+ 0xFFF7,
+ 0xFFEF,
+ 0xFFDF,
+ 0xFFBF,
+ 0xFF7F,
 };
 
 
@@ -503,6 +513,7 @@ void setup()
     IO_init();
     Timer_Init();
     ECheckList_Client.station_init();
+    ECheckList_Client.alarm_check_item_status();
 }
 
 void loop()

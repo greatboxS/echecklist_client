@@ -49,7 +49,7 @@ typedef enum ECheckItem_Def
 
 typedef enum ECheckNote_Def
 {
-	DURTY,
+	DURTY=1,
 	HIGH_TEMPERERTURE,
 	_1,
 	_2,
@@ -304,6 +304,16 @@ typedef struct ECheckStation_t
 		seting_up(id);
 	}
 
+	void reset_all_check_items()
+	{
+		printf("Reset all items\r\n");
+		for (size_t i = 0; i < ECheckItems.size(); i++)
+		{
+			 ECheckItems[i].Status = OK;
+		}
+		
+	}
+
 	void EEPROM_save_area_id()
 	{
 		printf("Save devie id to EEPROM\r\n");
@@ -449,13 +459,13 @@ static const uint8_t table_crc_lo[] = {
 	0x44, 0x84, 0x85, 0x45, 0x87, 0x47, 0x46, 0x86, 0x82, 0x42,
 	0x43, 0x83, 0x41, 0x81, 0x80, 0x40};
 
-#line 451 "e:\\Visual Code\\EcheckList_Stm32\\ECheckLib.h"
+#line 461 "e:\\Visual Code\\EcheckList_Stm32\\ECheckLib.h"
 static uint16_t crc16(uint8_t *buffer, uint16_t buffer_length);
 #line 19 "e:\\Visual Code\\EcheckList_Stm32\\ECheckList_Client.ino"
 void setup();
-#line 32 "e:\\Visual Code\\EcheckList_Stm32\\ECheckList_Client.ino"
+#line 33 "e:\\Visual Code\\EcheckList_Stm32\\ECheckList_Client.ino"
 void loop();
-#line 451 "e:\\Visual Code\\EcheckList_Stm32\\ECheckLib.h"
+#line 461 "e:\\Visual Code\\EcheckList_Stm32\\ECheckLib.h"
 static uint16_t crc16(uint8_t *buffer, uint16_t buffer_length)
 {
 	uint8_t crc_hi = 0xFF; /* high CRC byte initialized */
@@ -510,6 +520,7 @@ void setup()
     IO_init();
     Timer_Init();
     ECheckList_Client.station_init();
+    ECheckList_Client.alarm_check_item_status();
 }
 
 void loop()

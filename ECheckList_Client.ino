@@ -27,6 +27,7 @@ void setup()
     IO_init();
     Timer_Init();
     ECheckList_Client.station_init();
+    ECheckList_Client.alarm_check_item_status();
 }
 
 void loop()

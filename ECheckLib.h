@@ -48,7 +48,7 @@ typedef enum ECheckItem_Def
 
 typedef enum ECheckNote_Def
 {
-	DURTY,
+	DURTY=1,
 	HIGH_TEMPERERTURE,
 	_1,
 	_2,
@@ -301,6 +301,16 @@ typedef struct ECheckStation_t
 		AreaId = id;
 		EEPROM_save_area_id();
 		seting_up(id);
+	}
+
+	void reset_all_check_items()
+	{
+		printf("Reset all items\r\n");
+		for (size_t i = 0; i < ECheckItems.size(); i++)
+		{
+			 ECheckItems[i].Status = OK;
+		}
+		
 	}
 
 	void EEPROM_save_area_id()
