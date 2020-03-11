@@ -169,8 +169,6 @@ const uint8_t ECheckNoteArray[]{
  _6,
  _7,
  _81,
- _9,
- _10,
 };
 
 const ECheckArea_Def ECheckAreaArray[]{
@@ -313,6 +311,7 @@ typedef struct ECheckStation_t
   for (size_t i = 0; i < ECheckItems.size(); i++)
   {
     ECheckItems[i].Status = OK;
+    CheckNote_Index=0;
   }
 
  }
@@ -340,7 +339,7 @@ typedef struct ECheckStation_t
   EEPROM.begin();
   for (size_t i = 0; i < ECheckItems.size(); i++)
   {
-   EEPROM.write(2 /*begin of check item*/ + i, ECheckItems[i].Status);
+   EEPROM.write(10 /*begin of check item*/ + i, ECheckItems[i].Status);
   }
   EEPROM.end();
  }
@@ -374,7 +373,7 @@ typedef struct ECheckStation_t
 
   for (size_t i = 0; i < ECheckItems.size(); i++)
   {
-   ECheckItems[i].Status = EEPROM.read(2 /*begin of check item*/ + i);
+   ECheckItems[i].Status = EEPROM.read(10 /*begin of check item*/ + i);
   }
 
   EEPROM.end();
@@ -382,14 +381,14 @@ typedef struct ECheckStation_t
 };
 
 uint8_t SelectItemLampVal[8]{
- 0xFFFE,
- 0xFFFD,
- 0xFFFB,
- 0xFFF7,
- 0xFFEF,
- 0xFFDF,
- 0xFFBF,
- 0xFF7F,
+ 0x01,
+ 0x02,
+ 0x04,
+ 0x08,
+ 0x10,
+ 0x20,
+ 0x40,
+ 0x80,
 };
 
 
@@ -501,6 +500,10 @@ int Select_Note_Index = -1;
 
 int Setting_TimeOut = 0;
 int NewId = 0;
+int tick = 0;
+
+uint8_t hex_to_int(char c);
+uint8_t get_mac_from_string(const char *buf);
 
 void setup()
 {
@@ -513,11 +516,15 @@ void setup()
     IO_init();
     Timer_Init();
     ECheckList_Client.station_init();
-    ECheckList_Client.alarm_check_item_status();
 }
 
 void loop()
 {
+    if (millis() - tick > 500)
+    {
+        tick = millis();
+        ECheckList_Client.alarm_check_item_status();
+    }
     //---------------------------------------------------------
     if (!digitalRead(6 /* Nu?t nh�?n cho phe?p Checking*/))
     {
@@ -553,7 +560,6 @@ void loop()
         printf("BUT_OK_PIN\r\n");
 
         ECheckList_Client.station_set_check_item_state(OK);
-        ECheckList_Client.station_pick_current_notes(Select_Item_Index, Select_Note_Index);
     }
     //---------------------------------------------------------
     if (!digitalRead(2 /* Nu?t nh�?n tra?ng tha?i NOK*/))
@@ -584,6 +590,16 @@ void loop()
         ECheckList_Client.station_select_check_item_notes(true, Select_Note_Index);
     }
 
+    //---------------------------------------------------------
+    if (!digitalRead(12 /* L?u th�ng tin v??a checking*/))
+    {
+        while (!digitalRead(12 /* L?u th�ng tin v??a checking*/))
+            ;
+        printf("BUT_NOTE_OK_PIN\r\n");
+
+        ECheckList_Client.station_pick_current_notes(Select_Item_Index, Select_Note_Index);
+    }
+
     ECheckList_Client.ethernet_running();
 
     debug_port_receiving_data();
@@ -592,7 +608,41 @@ void loop()
 
     Setting_TimeOut = 1000 * 60 * 5;
     NewId = 0;
-    switch (Api_request())
+    API_Function_t func = Api_request();
+    if (func == API_SETTING_MAC)
+    {
+        printf("Setting up your device now\r\n");
+        while (Setting_TimeOut > 0)
+        {
+            Setting_TimeOut -= 20;
+            if (Serial1.available() > 0)
+            {
+                String s = Serial1.readString();
+                uint8_t MAC[6];
+                uint8_t *temp = MAC;
+                int begin_mac_element = 0;
+                for (size_t i = 0; i < s.length(); i++)
+                {
+                    if (s.charAt(i) == ':' || s.charAt(i) == '-' || s.charAt(i) == ' ')
+                    {
+                        String element = s.substring(begin_mac_element, i);
+                        begin_mac_element = i + 1;
+                        *(temp++) = get_mac_from_string(element.c_str());
+                        printf("%X\r\n", *(temp - 1));
+                    }
+                }
+
+                String last = s.substring(begin_mac_element, s.length());
+                MAC[5] = last.toInt();
+
+                memccpy(ECheckList_Client.mac, MAC, 0, sizeof(ECheckList_Client.mac));
+                ECheckList_Client.EEPROM_save_mac();
+            }
+            delay(20);
+        }
+    }
+
+    switch (func)
     {
     case API_ENABLE_CHECK: // but enable check
         ECheckList_Client.station_enable_select_check_item(true);
@@ -615,10 +665,13 @@ void loop()
         break;
     case API_BUT_OK: // but ok
         ECheckList_Client.station_set_check_item_state(OK);
-        ECheckList_Client.station_pick_current_notes(Select_Item_Index, Select_Note_Index);
         break;
     case API_BUT_NOK: // but nok
         ECheckList_Client.station_set_check_item_state(NOT_OK);
+        break;
+
+    case API_NOTE_OK:
+        ECheckList_Client.station_pick_current_notes(Select_Item_Index, Select_Note_Index);
         break;
 
     case API_SET_AREA_ID: // set client id
@@ -654,4 +707,31 @@ void loop()
     }
 
     delay(2);
+}
+
+uint8_t hex_to_int(char c)
+{
+    if (c == 'A' || c == 'a')
+        return 10;
+    if (c == 'B' || c == 'b')
+        return 11;
+    if (c == 'C' || c == 'c')
+        return 12;
+    if (c == 'D' || c == 'd')
+        return 13;
+    if (c == 'E' || c == 'e')
+        return 14;
+    if (c == 'F' || c == 'f')
+        return 15;
+
+    if ((uint8_t)c >= 48 && (uint8_t)c < 48 + 9)
+        return (uint8_t)c - 48;
+}
+
+uint8_t get_mac_from_string(const char *buf)
+{
+    printf("hex to int: %s\r\n", buf);
+    uint8_t first_digit = hex_to_int(buf[0]);
+    uint8_t second_digit = hex_to_int(buf[1]);
+    return (first_digit << 4) || second_digit;
 }

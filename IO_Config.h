@@ -9,6 +9,8 @@
 #define BUT_ENABLE_SELECT_PEOPLE_PIN PB8 // Nu?t nh�?n cho phe?p thay ?�?i th�ng tin ng???i tr??c
 #define BUT_SUBMIT_PIN PB9				 // L?u th�ng tin v??a checking
 
+#define BUT_NOTE_OK_PIN PA8				 // L?u th�ng tin v??a checking
+
 // #define LAMP_ENABLE_CHECKING_PIN PB0
 // #define LAMP_SUBMIT_SUCCESS_PIN PB1
 // #define LAMP_ENABLE_SELECT_PEOPLE_PIN PB10
@@ -54,32 +56,33 @@
 
 // EEPROM STORE ADDRESS
 #define EEPROM_AREA_ID 0
-#define EEPROM_ITEM_STATE_ID 2 //begin of check item
+#define EEPROM_ITEM_STATE_ID 10 //begin of check item
 #define EEPROM_PERSON_ID 1
+#define EEPROM_MAC_ID 2
 
-// #define HC595_LAMP_1_ON 0x01
-// #define HC595_LAMP_2_ON 0x02
-// #define HC595_LAMP_3_ON 0x04
-// #define HC595_LAMP_4_ON 0x08
-// #define HC595_LAMP_5_ON 0x10
-// #define HC595_LAMP_6_ON 0x20
-// #define HC595_LAMP_7_ON 0x40
-// #define HC595_LAMP_8_ON 0x80
-// #define HC595_LAMP_9_ON 0x0100
-// #define HC595_LAMP_10_ON 0x0200
-// #define HC595_ALL_LAMP_OFF 0x00
+#define HC595_LAMP_1_ON 0x01
+#define HC595_LAMP_2_ON 0x02
+#define HC595_LAMP_3_ON 0x04
+#define HC595_LAMP_4_ON 0x08
+#define HC595_LAMP_5_ON 0x10
+#define HC595_LAMP_6_ON 0x20
+#define HC595_LAMP_7_ON 0x40
+#define HC595_LAMP_8_ON 0x80
+#define HC595_LAMP_9_ON 0x0100
+#define HC595_LAMP_10_ON 0x0200
+#define HC595_ALL_LAMP_OFF 0x00
 
-#define HC595_LAMP_1_ON 0xFFFE
-#define HC595_LAMP_2_ON 0xFFFD
-#define HC595_LAMP_3_ON 0xFFFB
-#define HC595_LAMP_4_ON 0xFFF7
-#define HC595_LAMP_5_ON 0xFFEF
-#define HC595_LAMP_6_ON 0xFFDF
-#define HC595_LAMP_7_ON 0xFFBF
-#define HC595_LAMP_8_ON 0xFF7F
-#define HC595_LAMP_9_ON 0xFEFF
-#define HC595_LAMP_10_ON 0xFDFF
-#define HC595_ALL_LAMP_OFF 0xFFFF
+#define IHC595_LAMP_1_ON 0xFFFE
+#define IHC595_LAMP_2_ON 0xFFFD
+#define IHC595_LAMP_3_ON 0xFFFB
+#define IHC595_LAMP_4_ON 0xFFF7
+#define IHC595_LAMP_5_ON 0xFFEF
+#define IHC595_LAMP_6_ON 0xFFDF
+#define IHC595_LAMP_7_ON 0xFFBF
+#define IHC595_LAMP_8_ON 0xFF7F
+#define IHC595_LAMP_9_ON 0xFEFF
+#define IHC595_LAMP_10_ON 0xFDFF
+#define IHC595_ALL_LAMP_OFF 0xFFFF
 
 const uint16_t LAMP_STATE[] = {
 	HC595_LAMP_1_ON,
@@ -93,6 +96,24 @@ const uint16_t LAMP_STATE[] = {
 	HC595_LAMP_9_ON,
 	HC595_LAMP_10_ON,
 	HC595_ALL_LAMP_OFF,
+};
+
+
+const uint16_t ILAMP_STATE[] = {
+	IHC595_LAMP_1_ON,
+	IHC595_LAMP_2_ON,
+	IHC595_LAMP_3_ON,
+	IHC595_LAMP_4_ON,
+	IHC595_LAMP_5_ON,
+	IHC595_LAMP_6_ON,
+	IHC595_LAMP_7_ON,
+	IHC595_LAMP_8_ON,
+	IHC595_LAMP_9_ON,
+	IHC595_LAMP_10_ON,
+	IHC595_ALL_LAMP_OFF,
+	IHC595_ALL_LAMP_OFF,
+	IHC595_ALL_LAMP_OFF,
+	IHC595_ALL_LAMP_OFF,
 };
 // Defile All IO IN ECHECKING SYSTEM
 #include <HardwareSerial.h>
@@ -193,6 +214,7 @@ void IO_init()
 	pinMode(BUT_OK_PIN, INPUT_PULLUP);
 	pinMode(BUT_NOK_PIN, INPUT_PULLUP);
 	pinMode(BUT_SUBMIT_PIN, INPUT_PULLUP);
+	pinMode(BUT_NOTE_OK_PIN, INPUT_PULLUP);
 
 	pinMode(HC595_1_SDI_PIN, OUTPUT);
 	pinMode(HC595_1_SCK_PIN, OUTPUT);

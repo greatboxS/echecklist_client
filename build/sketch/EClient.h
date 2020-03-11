@@ -11,12 +11,12 @@ private:
     uint8_t ENABLE_ALARM_VAL = 0x00; // 1 enable check, 0x02 person, 0x04 notes
 public:
     uint8_t mac[6] = {0xF6, 0x6C, 0x08, 0x62, 0x05, 0x0F};
-    //const char *Host = "Host: 10.10.10.1:32768";
-    //const char *ServerIp = "10.10.10.1";
-    //const int Port = 32768;
+    // const char *Host = "Host: 10.10.10.2:32760";
+    // const char *ServerIp = "10.10.10.2";
+    // const int Port = 32760;
 
-    const char *ServerIp = "10.4.3.41";
-    const char *Host = "Host: 10.4.3.41:32760";
+    const char *ServerIp = "10.10.10.21";
+    const char *Host = "Host: 10.10.10.21:32760";
     int Port = 32760;
 
     // const char *ServerIp = "192.168.0.1";
@@ -54,8 +54,7 @@ public:
 
     void alarm_but_submit_click();
     void alarm_submit_success(bool status);
-    void alarm_check_item_status();   // LED item ok or not ok
-    void alarm_current_note_status(); // LED enable select check item notes
+    void alarm_check_item_status(); // LED item ok or not ok
 
     void station_enable_select_check_item(bool status);               // for button enable select check item
     void station_select_new_person(bool direction, int &index);       // for butoon updown select check person
@@ -77,6 +76,55 @@ public:
     void serialize_local_data();          // serial data to json string
     bool ethernet_post_data();            // post ethernet data
     void ethernet_running();
+
+    void alarm_check_item_index_off()
+    {
+        uint8_t temp[2];
+        temp[0] = 0xff;
+        temp[1] = 0xff;
+        HC595_writeBytes(temp, 2, CHECK_ITEM_INDEX);
+    }
+
+    void alarm_check_item_note_off()
+    {
+        uint8_t temp[2];
+        temp[0] = 0xff;
+        temp[1] = 0xff;
+        HC595_writeBytes(temp, 2, CHECK_ITEM_NOTE_INDEX);
+    }
+
+    void alarm_enable_check_off()
+    {
+        ENABLE_ALARM_VAL = 0xFF;
+        HC595_shiftByte(ENABLE_ALARM_VAL, CHECK_ENABLE);
+        alarm_check_item_index_off();
+        alarm_check_item_note_off();
+    }
+
+    void EEPROM_save_mac()
+    {
+        printf("EEPROM_save_mac\r\n");
+        EEPROM.begin();
+        for (size_t i = 0; i < sizeof(mac); i++)
+        {
+            EEPROM.write(i + EEPROM_MAC_ID, mac[i]);
+            printf("%X\r\n", mac[i]);
+        }
+        EEPROM.end();
+    }
+
+    void EEPROM_read_mac()
+    {
+        EEPROM.begin();
+        printf("EEPROM_read_mac\r\n");
+        for (size_t i = 0; i < sizeof(mac); i++)
+        {
+            mac[i] = EEPROM.read(i + EEPROM_MAC_ID );
+            printf("%X\r\n", mac[i]);
+        }
+        EEPROM.end();
+        
+    }
 };
 
 void EClient::alarm_but_submit_click()
@@ -216,6 +264,17 @@ int EClient::ethernet_init()
         Serial.println(Ethernet.localIP());
     }
 
+    uint8_t Off[2]{0xFF, 0xFF};
+    uint8_t On[2]{0x00, 0x00};
+
+    for (size_t i = 0; i < 3; i++)
+    {
+        HC595_writeBytes(On, 2, CHECK_ITEM_NOTE_INDEX);
+        delay(50);
+        HC595_writeBytes(Off, 2, CHECK_ITEM_NOTE_INDEX);
+        delay(50);
+    }
+
     return exception;
 }
 
@@ -282,6 +341,10 @@ void EClient::station_init()
 {
     printf("Initializing local parameter\r\n");
     ECheckStation.EEPROM_read_local_data();
+    EEPROM_read_mac();
+    alarm_check_item_status();
+    alarm_check_person_index(0);
+    alarm_enable_check_off();
     ethernet_init();
 }
 
@@ -340,9 +403,9 @@ void EClient::alarm_enable_select_check_item(bool state)
 {
     printf("Alarm enable select check item %d\r\n", state);
     if (state)
-        ENABLE_ALARM_VAL = 0x01;
+        ENABLE_ALARM_VAL = 0xFE;
     else
-        ENABLE_ALARM_VAL &= 0xFE;
+        ENABLE_ALARM_VAL |= 0x01;
     HC595_shiftByte(ENABLE_ALARM_VAL, CHECK_ENABLE);
 }
 
@@ -350,9 +413,9 @@ void EClient::alarm_enable_select_check_person(bool state)
 {
     printf("Alarm enable select person %d\r\n", state);
     if (state)
-        ENABLE_ALARM_VAL = 0x02;
+        ENABLE_ALARM_VAL = 0xFD;
     else
-        ENABLE_ALARM_VAL &= 0xFD;
+        ENABLE_ALARM_VAL |= 0x02;
 
     HC595_shiftByte(ENABLE_ALARM_VAL, CHECK_ENABLE);
 }
@@ -365,11 +428,11 @@ void EClient::alarm_enable_select_note()
     ENABLE_ALARM_VAL = 0x04;
     HC595_shiftByte(ENABLE_ALARM_VAL, CHECK_ENABLE);
 
-    byte notes[2] = {0xFF, 0xFF};
+    byte notes[2] = {0x00, 0x00};
     HC595_writeBytes(notes, 2, CHECK_ITEM_NOTE_INDEX);
     delay(50);
-    notes[0] = 0x00;
-    notes[1] = 0x00;
+    notes[0] = 0xFF;
+    notes[1] = 0xFF;
     HC595_writeBytes(notes, 2, CHECK_ITEM_NOTE_INDEX);
     delay(50);
     int begin_index = -1;
@@ -380,35 +443,35 @@ void EClient::alarm_enable_select_note()
 void EClient::alarm_check_item_index(int index) // LED selected item //on when enable and off after submit
 {
     printf("Alarm check item index %d\r\n", index);
-    uint8_t high_byte = uint8_t(LAMP_STATE[index] >> 8);
-    uint8_t low_byte = uint8_t(LAMP_STATE[index] & 0xFFFF);
-    HC595_shiftByte(high_byte, CHECK_ITEM_INDEX);
-    HC595_shiftByte(low_byte, CHECK_ITEM_INDEX);
+    uint8_t temp[2];
+    temp[0] = uint8_t(ILAMP_STATE[index] >> 8);
+    temp[1] = uint8_t(ILAMP_STATE[index] & 0xFFFF);
+    HC595_writeBytes(temp, 2, CHECK_ITEM_INDEX);
 }
 
 void EClient::alarm_check_person_index(int index) // LED selected person
 {
     printf("Alarm check person index %d\r\n", index);
-    uint8_t high_byte = uint8_t(LAMP_STATE[index] >> 8);
-    uint8_t low_byte = uint8_t(LAMP_STATE[index] & 0xFFFF);
-    HC595_shiftByte(high_byte, CHECK_PERSON_INDEX);
-    HC595_shiftByte(low_byte, CHECK_PERSON_INDEX);
+    uint8_t temp[2];
+    temp[0] = uint8_t(ILAMP_STATE[index] >> 8);
+    temp[1] = uint8_t(ILAMP_STATE[index] & 0xFFFF);
+    HC595_writeBytes(temp, 2, CHECK_PERSON_INDEX);
 }
 
 void EClient::alarm_check_item_note_index(int index) // LED slected notes
 {
     printf("Alarm check note index %d\r\n", index);
-    uint8_t high_byte = uint8_t(LAMP_STATE[index] >> 8);
-    uint8_t low_byte = uint8_t(LAMP_STATE[index] & 0xFFFF);
-    HC595_shiftByte(high_byte, CHECK_ITEM_NOTE_INDEX);
-    HC595_shiftByte(low_byte, CHECK_ITEM_NOTE_INDEX);
+    uint8_t temp[2];
+    temp[0] = uint8_t(ILAMP_STATE[index] >> 8);
+    temp[1] = uint8_t(ILAMP_STATE[index] & 0xFFFF);
+    HC595_writeBytes(temp, 2, CHECK_ITEM_NOTE_INDEX);
 }
 
 //-------------------------------------------ALARM STATUS------------------------------------------------
 void EClient::alarm_check_item_status()
 {
     printf("Alarm check item status\r\n");
-    uint16_t check_item_status = 0xFFFF;
+    uint16_t check_item_status = 0xffff;
 
     printf("Items status value: \r\n");
     for (size_t i = 0; i < ECheckStation.ECheckItems.size(); i++)
@@ -416,7 +479,7 @@ void EClient::alarm_check_item_status()
 
         if (ECheckStation.ECheckItems[i].Status == OK)
         {
-            check_item_status &= LAMP_STATE[i];
+            check_item_status &= ILAMP_STATE[i];
             printf("%d", 1);
         }
         else
@@ -426,20 +489,10 @@ void EClient::alarm_check_item_status()
         printf("\r\n");
     }
 
-    uint8_t high_byte = uint8_t(check_item_status >> 8);
-    uint8_t low_byte = uint8_t(check_item_status);
-    HC595_shiftByte(high_byte, CHECK_ITEM_STATUS);
-    HC595_shiftByte(low_byte, CHECK_ITEM_STATUS);
-}
-
-void EClient::alarm_current_note_status()
-{
-    printf("Alarm selected item note status\r\n");
-    uint8_t currentNote = ECheckStation.get_current_note_index();
-    uint8_t high_byte = uint8_t(LAMP_STATE[currentNote] >> 8);
-    uint8_t low_byte = uint8_t(LAMP_STATE[currentNote] & 0xFFFF);
-    HC595_shiftByte(high_byte, CHECK_ITEM_NOTE_INDEX);
-    HC595_shiftByte(low_byte, CHECK_ITEM_NOTE_INDEX);
+    uint8_t temp[2];
+    temp[0] = uint8_t(check_item_status >> 8);
+    temp[1] = uint8_t(check_item_status & 0xFFFF);
+    HC595_writeBytes(temp, 2, CHECK_ITEM_STATUS);
 }
 
 //-----------------------------------------BUTTON ENABLE-------------------------------------------------
@@ -449,6 +502,7 @@ void EClient::station_enable_select_check_item(bool status)
     int begin_index = -1;
     if (status && !Enable_Check)
     {
+        alarm_check_item_note_off();
         ECheckStation.reset_all_check_items();
         station_enable_select_check_person(false);
         state = true;
@@ -457,9 +511,17 @@ void EClient::station_enable_select_check_item(bool status)
     }
 
     if (Enable_Check)
+    {
         state = false;
+    }
 
     Enable_Check = state;
+    if (!Enable_Check)
+    {
+        alarm_enable_check_off();
+    }
+
+    alarm_check_item_status();
     alarm_enable_select_check_item(state);
 }
 
@@ -473,6 +535,7 @@ void EClient::station_enable_select_check_person(bool status)
         station_enable_select_check_item(false);
         station_select_new_person(true, begin_index);
         Enable_Select_Note = false;
+        alarm_enable_check_off();
     }
 
     if (Enable_Select_Person)
@@ -486,13 +549,22 @@ void EClient::station_enable_select_check_person(bool status)
 void EClient::station_enable_select_check_item_note(bool state)
 {
     printf("Station select notes\r\n");
-    Enable_Select_Note = true;
-    station_enable_select_check_item(false);
-    station_enable_select_check_person(false);
-    alarm_enable_select_note();
+    if (state)
+    {
+        Enable_Select_Note = true;
+        Enable_Check = false;
+        station_enable_select_check_item(false);
+        station_enable_select_check_person(false);
+        alarm_enable_select_note();
 
-    int begin_index = -1;
-    station_select_check_item_notes(true, begin_index);
+        int begin_index = -1;
+        station_select_check_item_notes(true, begin_index);
+    }
+    else
+    {
+        Enable_Select_Note = false;
+        alarm_check_item_note_off();
+    }
 }
 //-------------------------------------------BUTTON UP DOWN-----------------------------------------------
 void EClient::station_select_new_check_item(bool direction, int &index)
@@ -567,6 +639,14 @@ void EClient::station_select_check_item_notes(bool direction, int &index)
 //-------------------------------------------BUTTON OK----------------------------------------------------
 void EClient::station_set_check_item_state(uint8_t state)
 {
+    if (Enable_Select_Note)
+    {
+        Enable_Check = true;
+        Enable_Select_Note = false;
+        alarm_enable_select_check_item(true);
+        alarm_check_item_note_off();
+    }
+
     if (!Enable_Check)
         return;
 
@@ -583,6 +663,10 @@ void EClient::station_set_check_item_state(uint8_t state)
     {
         station_enable_select_check_item_note(true);
         alarm_enable_select_note();
+    }
+    else
+    {
+        station_enable_select_check_item_note(false);
     }
 }
 
@@ -602,6 +686,7 @@ void EClient::station_pick_current_notes(int &item_index, int &note_index)
         Enable_Check = true;
         Enable_Select_Note = false;
         Enable_Select_Person = false;
+        alarm_check_item_note_off();
         alarm_enable_select_check_item(true);
     }
     else

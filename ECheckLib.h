@@ -165,8 +165,6 @@ const uint8_t ECheckNoteArray[]{
 	_6,
 	_7,
 	_81,
-	_9,
-	_10,
 };
 
 const ECheckArea_Def ECheckAreaArray[]{
@@ -309,6 +307,7 @@ typedef struct ECheckStation_t
 		for (size_t i = 0; i < ECheckItems.size(); i++)
 		{
 			 ECheckItems[i].Status = OK;
+			 CheckNote_Index=0;
 		}
 		
 	}

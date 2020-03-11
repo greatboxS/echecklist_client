@@ -17,6 +17,8 @@ typedef enum API_Function_t
     API_BUT_NOK,
     API_SET_AREA_ID,
     API_RESTART_DEVICE,
+    API_NOTE_OK,
+    API_SETTING_MAC,
 
 };
 
@@ -84,6 +86,18 @@ void debug_port_receiving_data()
         {
             printf("API-Restart Device\r\n");
             API_Code = API_RESTART_DEVICE;
+        }
+
+        if(s.indexOf("but-note-ok")>-1)
+        {
+            printf("API-But set note ok\r\n");
+            API_Code = API_NOTE_OK;
+        }
+
+         if(s.indexOf("setting-mac")>-1)
+        {
+            printf("API-Setting mac Id\r\n");
+            API_Code = API_SETTING_MAC;
         }
     }
 }
