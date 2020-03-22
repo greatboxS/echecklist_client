@@ -33,6 +33,8 @@ public:
     String Url = "";
     char RX_Buffer[1024];
 
+    uint32_t Ticks = 0;
+
     bool cable_connected = false;
     bool module_connected = false;
     bool ip_initialized = false;
@@ -150,7 +152,7 @@ public:
             printf("%X\r\n", ServerIp[i]);
         }
         EEPROM.end();
-         printf("EEPROM_save_serverIp success\r\n");
+        printf("EEPROM_save_serverIp success\r\n");
     }
 };
 
@@ -217,12 +219,16 @@ void EClient::ethernet_running()
 
 void EClient::ethernet_checking_module()
 {
-    get_ethernet_module_status();
-
-    if (reset_module_now)
+    if ((millis() - Ticks) > 1000)
     {
-        reset_module_now = false;
-        ethernet_init();
+        Ticks = millis();
+        get_ethernet_module_status();
+
+        if (reset_module_now)
+        {
+            reset_module_now = false;
+            ethernet_init();
+        }
     }
 }
 
@@ -230,7 +236,7 @@ uint8_t EClient::get_ethernet_module_status()
 {
     if (Ethernet.hardwareStatus() == EthernetNoHardware)
     {
-        printf("Ethernet shield was not found.  Sorry, can't run without hardware\r\n");
+        //printf("Ethernet shield was not found.  Sorry, can't run without hardware\r\n");
         cable_connected = false;
         module_connected = false;
         return 0; // no hardware
