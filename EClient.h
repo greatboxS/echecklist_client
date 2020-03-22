@@ -369,6 +369,7 @@ void EClient::station_init()
     printf("Initializing local parameter\r\n");
     ECheckStation.EEPROM_read_local_data();
     EEPROM_read_mac();
+    EEPROM_read_serverIp();
     alarm_check_item_status();
     alarm_check_person_index(0);
     alarm_enable_check_off();
