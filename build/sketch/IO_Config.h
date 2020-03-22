@@ -9,7 +9,7 @@
 #define BUT_ENABLE_SELECT_PEOPLE_PIN PB8 // Nu?t nh�?n cho phe?p thay ?�?i th�ng tin ng???i tr??c
 #define BUT_SUBMIT_PIN PB9				 // L?u th�ng tin v??a checking
 
-#define BUT_NOTE_OK_PIN PA8				 // L?u th�ng tin v??a checking
+#define BUT_NOTE_OK_PIN PA8 // L?u th�ng tin v??a checking
 
 // #define LAMP_ENABLE_CHECKING_PIN PB0
 // #define LAMP_SUBMIT_SUCCESS_PIN PB1
@@ -56,9 +56,10 @@
 
 // EEPROM STORE ADDRESS
 #define EEPROM_AREA_ID 0
-#define EEPROM_ITEM_STATE_ID 10 //begin of check item
 #define EEPROM_PERSON_ID 1
 #define EEPROM_MAC_ID 2
+#define EEPROM_SERVER_IP (EEPROM_MAC_ID + 6)
+#define EEPROM_ITEM_STATE_ID (EEPROM_SERVER_IP + 20) //begin of check item
 
 #define HC595_LAMP_1_ON 0x01
 #define HC595_LAMP_2_ON 0x02
@@ -97,7 +98,6 @@ const uint16_t LAMP_STATE[] = {
 	HC595_LAMP_10_ON,
 	HC595_ALL_LAMP_OFF,
 };
-
 
 const uint16_t ILAMP_STATE[] = {
 	IHC595_LAMP_1_ON,
@@ -170,7 +170,7 @@ void HC595_shift(uint8_t shift_reg, uint8_t type)
 		OutPut_Pin(HC595_SCK_PIN[type], LOW);
 		shift_reg = shift_reg << 1;
 	}
-} 
+}
 
 void HC595_shiftByte(uint8_t shift_reg, uint8_t type)
 {

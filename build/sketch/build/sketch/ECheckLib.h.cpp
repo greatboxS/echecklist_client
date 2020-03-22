@@ -458,13 +458,6 @@ static const uint8_t table_crc_lo[] = {
 	0x44, 0x84, 0x85, 0x45, 0x87, 0x47, 0x46, 0x86, 0x82, 0x42,
 	0x43, 0x83, 0x41, 0x81, 0x80, 0x40};
 
-#line 460 "e:\\Visual Code\\EcheckList_Stm32\\ECheckLib.h"
-static uint16_t crc16(uint8_t *buffer, uint16_t buffer_length);
-#line 23 "e:\\Visual Code\\EcheckList_Stm32\\ECheckList_Client.ino"
-void setup();
-#line 36 "e:\\Visual Code\\EcheckList_Stm32\\ECheckList_Client.ino"
-void loop();
-#line 460 "e:\\Visual Code\\EcheckList_Stm32\\ECheckLib.h"
 static uint16_t crc16(uint8_t *buffer, uint16_t buffer_length)
 {
 	uint8_t crc_hi = 0xFF; /* high CRC byte initialized */

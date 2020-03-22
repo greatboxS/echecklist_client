@@ -148,10 +148,28 @@ void loop()
                 }
 
                 String last = s.substring(begin_mac_element, s.length());
-                MAC[5] = last.toInt();
+                *(temp) = get_mac_from_string(last.c_str());
 
                 memccpy(ECheckList_Client.mac, MAC, 0, sizeof(ECheckList_Client.mac));
                 ECheckList_Client.EEPROM_save_mac();
+                NVIC_SystemReset();
+            }
+            delay(20);
+        }
+    }
+
+    if (func == API_SETTING_SERVER_IP)
+    {
+        printf("Setting up your device now\r\n");
+        while (Setting_TimeOut > 0)
+        {
+            Setting_TimeOut -= 20;
+            if (Serial.available() > 0)
+            {
+                String s = Serial.readString();
+                memccpy(ECheckList_Client.ServerIp, s.c_str(), 0, sizeof(ECheckList_Client.ServerIp));
+                ECheckList_Client.EEPROM_save_serverIp();
+                NVIC_SystemReset();
             }
             delay(20);
         }
@@ -248,5 +266,5 @@ uint8_t get_mac_from_string(const char *buf)
     printf("hex to int: %s\r\n", buf);
     uint8_t first_digit = hex_to_int(buf[0]);
     uint8_t second_digit = hex_to_int(buf[1]);
-    return (first_digit << 4) || second_digit;
+    return first_digit * 16 + second_digit;
 }

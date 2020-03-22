@@ -15,8 +15,8 @@ public:
     // const char *ServerIp = "10.10.10.2";
     // const int Port = 32760;
 
-    const char *ServerIp = "10.10.10.21";
-    const char *Host = "Host: 10.10.10.21:32760";
+    char ServerIp[20] = "10.10.10.2";
+    char Host[64] = "Host: 10.10.10.2:32760";
     int Port = 32760;
 
     // const char *ServerIp = "192.168.0.1";
@@ -111,6 +111,7 @@ public:
             printf("%X\r\n", mac[i]);
         }
         EEPROM.end();
+        printf("EEPROM_save_mac success\r\n");
     }
 
     void EEPROM_read_mac()
@@ -119,11 +120,37 @@ public:
         printf("EEPROM_read_mac\r\n");
         for (size_t i = 0; i < sizeof(mac); i++)
         {
-            mac[i] = EEPROM.read(i + EEPROM_MAC_ID );
+            mac[i] = EEPROM.read(i + EEPROM_MAC_ID);
             printf("%X\r\n", mac[i]);
         }
         EEPROM.end();
-        
+    }
+
+    void EEPROM_read_serverIp()
+    {
+        EEPROM.begin();
+        printf("EEPROM_read_mac\r\n");
+        for (size_t i = 0; i < sizeof(ServerIp); i++)
+        {
+            ServerIp[i] = EEPROM.read(i + EEPROM_SERVER_IP);
+            printf("%X\r\n", ServerIp[i]);
+        }
+        EEPROM.end();
+        snprintf(Host, sizeof(Host), "Host: %s:%d", ServerIp, Port);
+        printf("Read ServerIp OK %s\r\n", Host);
+    }
+
+    void EEPROM_save_serverIp()
+    {
+        printf("EEPROM_save_serverIp\r\n");
+        EEPROM.begin();
+        for (size_t i = 0; i < sizeof(ServerIp); i++)
+        {
+            EEPROM.write(i + EEPROM_SERVER_IP, ServerIp[i]);
+            printf("%X\r\n", ServerIp[i]);
+        }
+        EEPROM.end();
+         printf("EEPROM_save_serverIp success\r\n");
     }
 };
 

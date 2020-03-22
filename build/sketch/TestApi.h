@@ -19,6 +19,7 @@ typedef enum API_Function_t
     API_RESTART_DEVICE,
     API_NOTE_OK,
     API_SETTING_MAC,
+    API_SETTING_SERVER_IP,
 
 };
 
@@ -96,8 +97,14 @@ void debug_port_receiving_data()
 
          if(s.indexOf("setting-mac")>-1)
         {
-            printf("API-Setting mac Id\r\n");
+            printf("API-Setting mac id\r\n");
             API_Code = API_SETTING_MAC;
+        }
+
+        if(s.indexOf("setting-ip")>-1)
+        {
+            printf("API-Setting server ip\r\n");
+            API_Code = API_SETTING_SERVER_IP;
         }
     }
 }
