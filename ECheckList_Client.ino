@@ -31,6 +31,7 @@ void setup()
     IO_init();
     Timer_Init();
     ECheckList_Client.station_init();
+    Select_Person_Index = ECheckList_Client.ECheckStation.CheckPerson_Index;
 }
 
 void loop()
@@ -167,6 +168,7 @@ void loop()
             if (Serial.available() > 0)
             {
                 String s = Serial.readString();
+                s.trim();
                 memccpy(ECheckList_Client.ServerIp, s.c_str(), 0, sizeof(ECheckList_Client.ServerIp));
                 ECheckList_Client.EEPROM_save_serverIp();
                 NVIC_SystemReset();

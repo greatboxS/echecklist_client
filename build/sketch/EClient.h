@@ -25,10 +25,7 @@ public:
 
     const char *Post = "POST /echecklist/post HTTP/1.1";
     const char *ContentType = "Content-Type: application/json";
-    const char *Connection = "Connection: keep-alive";
-    const char *CashControl = "Cache-Control: max-age=0";
-    const char *UpgradeInsecure = "Upgrade-Insecure-Requests: 1";
-    const char *UserAgent = "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36";
+    const char *Connection = "Connection: close";
 
     String Url = "";
     char RX_Buffer[1024];
@@ -38,6 +35,10 @@ public:
     bool cable_connected = false;
     bool module_connected = false;
     bool ip_initialized = false;
+    bool got_ip = false;
+
+    IPAddress local_ip, dns_ip, gateway_ip, subnet_ip;
+
     ECheckStation_t ECheckStation;
     EthernetClient client;
 
@@ -71,6 +72,26 @@ public:
     void station_init();
 
     bool start_connect_to_server(uint32_t timeout = 20000);
+    void ethernet_reinit();
+
+    void ethernet_reset()
+    {
+        digitalWrite(ETHERNET_RST_PIN, LOW);
+        delay(50);
+        digitalWrite(ETHERNET_RST_PIN, HIGH);
+        delay(3000);
+    }
+
+    void ethernet_begin()
+    {
+        int ethernet_init_retry = 5;
+        while (ethernet_init() == 0)
+        {
+            ethernet_init_retry--;
+            if (ethernet_init_retry < 0)
+                break;
+        }
+    }
 
     int ethernet_init();                  // get ethernet module Ip
     void ethernet_checking_module();      // call this function to check ethernet module all the tim
@@ -131,12 +152,12 @@ public:
     void EEPROM_read_serverIp()
     {
         EEPROM.begin();
-        printf("EEPROM_read_mac\r\n");
+        printf("EEPROM_read_serverIp\r\n");
         for (size_t i = 0; i < sizeof(ServerIp); i++)
         {
             ServerIp[i] = EEPROM.read(i + EEPROM_SERVER_IP);
-            printf("%X\r\n", ServerIp[i]);
         }
+        printf("%s\r\n", ServerIp);
         EEPROM.end();
         snprintf(Host, sizeof(Host), "Host: %s:%d", ServerIp, Port);
         printf("Read ServerIp OK %s\r\n", Host);
@@ -227,7 +248,10 @@ void EClient::ethernet_checking_module()
         if (reset_module_now)
         {
             reset_module_now = false;
-            ethernet_init();
+            if (got_ip)
+                ethernet_reinit();
+            else
+                ethernet_begin();
         }
     }
 }
@@ -260,6 +284,15 @@ uint8_t EClient::get_ethernet_module_status()
     return 1; // cable connect ok
 }
 
+void EClient::ethernet_reinit()
+{
+    Ethernet.init(ETHERNET_CS_PIN);
+    printf("Ethernet reconfigurating module\r\n");
+    Ethernet.begin(mac, local_ip, dns_ip, gateway_ip, subnet_ip);
+    cable_connected = true;
+    ip_initialized = true;
+}
+
 int EClient::ethernet_init()
 {
     Ethernet.init(ETHERNET_CS_PIN);
@@ -269,7 +302,7 @@ int EClient::ethernet_init()
     // IPAddress debug_ip(192, 168, 0, 2);
     // Ethernet.begin(mac, debug_ip);
     // return 1;
-    int exception = Ethernet.begin(mac, 20000);
+    int exception = Ethernet.begin(mac, 5000);
 
     if (exception == 0)
     {
@@ -295,17 +328,23 @@ int EClient::ethernet_init()
         ip_initialized = true;
         printf("Ethernet module get Ip successfull\r\n");
         Serial.println(Ethernet.localIP());
-    }
 
-    uint8_t Off[2]{0xFF, 0xFF};
-    uint8_t On[2]{0x00, 0x00};
+        local_ip = Ethernet.localIP();
+        dns_ip = Ethernet.dnsServerIP();
+        gateway_ip = Ethernet.gatewayIP();
+        subnet_ip = Ethernet.subnetMask();
+        got_ip = true;
 
-    for (size_t i = 0; i < 3; i++)
-    {
-        HC595_writeBytes(On, 2, CHECK_ITEM_NOTE_INDEX);
-        delay(50);
-        HC595_writeBytes(Off, 2, CHECK_ITEM_NOTE_INDEX);
-        delay(50);
+        uint8_t Off[2]{0xFF, 0xFF};
+        uint8_t On[2]{0x00, 0x00};
+
+        for (size_t i = 0; i < 3; i++)
+        {
+            HC595_writeBytes(On, 2, CHECK_ITEM_NOTE_INDEX);
+            delay(50);
+            HC595_writeBytes(Off, 2, CHECK_ITEM_NOTE_INDEX);
+            delay(50);
+        }
     }
 
     return exception;
@@ -343,6 +382,11 @@ void EClient::serialize_local_data()
 
 bool EClient::ethernet_post_data()
 {
+    if (got_ip)
+        ethernet_reinit();
+    else
+        ethernet_begin();
+
     if (!client.connected())
     {
         if (!start_connect_to_server())
@@ -360,9 +404,6 @@ bool EClient::ethernet_post_data()
     client.println(Post);
     client.println(Host);
     client.println(Connection);
-    client.println(CashControl);
-    client.println(UpgradeInsecure);
-    client.println(UserAgent);
     client.println(ContentType);
     client.println(ContentLength);
     client.println();
@@ -377,9 +418,9 @@ void EClient::station_init()
     EEPROM_read_mac();
     EEPROM_read_serverIp();
     alarm_check_item_status();
-    alarm_check_person_index(0);
+    alarm_check_person_index(ECheckStation.CheckPerson_Index);
     alarm_enable_check_off();
-    ethernet_init();
+    ethernet_begin();
 }
 
 bool EClient::start_connect_to_server(uint32_t timeout)
