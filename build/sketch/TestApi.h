@@ -20,6 +20,7 @@ typedef enum API_Function_t
     API_NOTE_OK,
     API_SETTING_MAC,
     API_SETTING_SERVER_IP,
+    API_SETTING_SERVER_PORT,
 
 };
 
@@ -105,6 +106,12 @@ void debug_port_receiving_data()
         {
             printf("API-Setting server ip\r\n");
             API_Code = API_SETTING_SERVER_IP;
+        }
+
+        if(s.indexOf("setting-port")>-1)
+        {
+            printf("API-Setting server port\r\n");
+            API_Code = API_SETTING_SERVER_PORT;
         }
     }
 }

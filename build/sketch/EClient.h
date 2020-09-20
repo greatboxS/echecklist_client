@@ -157,9 +157,8 @@ public:
         {
             ServerIp[i] = EEPROM.read(i + EEPROM_SERVER_IP);
         }
-        printf("%s\r\n", ServerIp);
         EEPROM.end();
-        snprintf(Host, sizeof(Host), "Host: %s:%d", ServerIp, Port);
+        snprintf(Host,sizeof(Host), "Host: %s:%d", ServerIp, Port);
         printf("Read ServerIp OK %s\r\n", Host);
     }
 
@@ -174,6 +173,28 @@ public:
         }
         EEPROM.end();
         printf("EEPROM_save_serverIp success\r\n");
+    }
+
+    void EEPROM_read_serverPort()
+    {
+        printf("EEPROM_read_serverPort\r\n");
+        EEPROM.begin();
+        uint8_t port1 = EEPROM.read(EEPROM_SERVER_PORT);
+        uint8_t port2 = EEPROM.read(EEPROM_SERVER_PORT + 1);
+        Port = 0x00;
+        Port = port1 * 256 + port2;
+        EEPROM.end();
+        printf("Read server port value %d\r\n", Port);
+    }
+
+    void EEPROM_save_serverPort()
+    {
+        printf("EEPROM_save_serverPort\r\n");
+        EEPROM.begin();
+        EEPROM.write(EEPROM_SERVER_PORT, (uint8_t)(Port >> 8));
+        EEPROM.write(EEPROM_SERVER_PORT + 1, (uint8_t)Port);
+        EEPROM.end();
+        printf("EEPROM_save_serverPort success\r\n");
     }
 };
 
@@ -415,6 +436,7 @@ void EClient::station_init()
 {
     printf("Initializing local parameter\r\n");
     ECheckStation.EEPROM_read_local_data();
+    EEPROM_read_serverPort();
     EEPROM_read_mac();
     EEPROM_read_serverIp();
     alarm_check_item_status();

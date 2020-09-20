@@ -2,18 +2,24 @@
     "configurations": [
         {
             "name": "Win32",
+            "defines": [
+                "ARDUINO=10800"
+            ],
             "includePath": [
-                "C:\\Users\\Dell-PC\\AppData\\Local\\Arduino15\\packages\\STM32\\hardware\\stm32\\1.7.0\\**",
-                "C:\\Users\\Dell-PC\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\**",
-                "F:\\Arduino\\hardware\\tools\\**",
-                "F:\\Arduino\\libraries\\**",
-                "C:\\Users\\Dell-PC\\Documents\\Arduino\\hardware\\tools\\**",
-                "C:\\Users\\Dell-PC\\Documents\\Arduino\\libraries\\**"
+                "${workspaceRoot}",
+                "C:\\Users\\phuoc\\AppData\\Local\\Arduino15\\packages\\STM32\\hardware\\stm32\\1.9.0\\**",
+                "C:\\Users\\phuoc\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\**",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\**",
+                "C:\\Program Files (x86)\\Arduino\\libraries\\**",
+                "C:\\Users\\phuoc\\Documents\\Arduino\\libraries\\**"
             ],
             "forcedInclude": [
-                "C:\\Users\\Dell-PC\\AppData\\Local\\Arduino15\\packages\\STM32\\hardware\\stm32\\1.7.0\\cores\\arduino\\Arduino.h"
+                "C:\\Users\\phuoc\\AppData\\Local\\Arduino15\\packages\\STM32\\hardware\\stm32\\1.9.0\\cores\\arduino\\Arduino.h"
             ],
-            "intelliSenseMode": "msvc-x64"
+            "intelliSenseMode": "clang-x64",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.27.29110/bin/Hostx64/x64/cl.exe"
         }
     ],
     "version": 4

@@ -177,6 +177,29 @@ void loop()
         }
     }
 
+    if (func == API_SETTING_SERVER_PORT)
+    {
+        printf("Setting up your device now\r\n");
+        while (Setting_TimeOut > 0)
+        {
+            Setting_TimeOut -= 20;
+            if (Serial.available() > 0)
+            {
+                String s = Serial.readString();
+                s.trim();
+                
+                ECheckList_Client.Port = (int)s.toInt();
+
+                printf("%d\r\n", ECheckList_Client.Port);
+                ECheckList_Client.EEPROM_save_serverPort();
+
+                printf("Server Port: %d saved successfully", ECheckList_Client.Port);
+                NVIC_SystemReset();
+            }
+            delay(20);
+        }
+    }
+
     switch (func)
     {
     case API_ENABLE_CHECK: // but enable check

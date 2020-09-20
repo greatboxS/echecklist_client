@@ -4,6 +4,7 @@
 #include "SysConfig.h"
 #include "EClient.h"
 #include <HardwareSerial.h>
+#include <HardwareTimer.h>
 
 #define MASTER_ID	0x80
 
@@ -22,8 +23,8 @@ TIM_HandleTypeDef  Timer1, Timer2;
 HardwareTimer* FlashLedTimer, * CheckingTimer;
 
 
-void CheckingTimerCallback(HardwareTimer* xTimer);
-void FlashLedTimerCallback(HardwareTimer* xTimer);
+void CheckingTimerCallback(void);
+void FlashLedTimerCallback(void);
 
 void IO_init();
 void Timer_Init();
@@ -39,17 +40,16 @@ void System_Starup()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void CheckingTimerCallback(HardwareTimer* xTimer)
+void CheckingTimerCallback(void)
 {
 	//printf("Timer 2 callback\r\n");
 }
 //
-void FlashLedTimerCallback(HardwareTimer* xTimer)
+void FlashLedTimerCallback(void)
 {
 	//function_log();
 	FlashLed(!FlashLedVal());
 }
-
 void Timer_Init()
 {
 	printf("Timer init\r\n");
@@ -64,8 +64,8 @@ void Timer_Init()
 	CheckingTimer->setOverflow(10000000, MICROSEC_FORMAT);
 
 	// attach interrupt timer
-	FlashLedTimer->attachInterrupt(FlashLedTimerCallback);
-	CheckingTimer->attachInterrupt(CheckingTimerCallback);
+	FlashLedTimer->attachInterrupt(&FlashLedTimerCallback);
+	CheckingTimer->attachInterrupt(&CheckingTimerCallback);
 
 	FlashLedTimer->resume();
 	CheckingTimer->resume();

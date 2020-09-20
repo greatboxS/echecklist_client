@@ -2,6 +2,6 @@
     "board": "STM32:stm32:GenF1",
     "configuration": "pnum=BLUEPILL_F103C8,upload_method=swdMethod,xserial=generic,usb=none,xusb=FS,opt=osstd,rtlib=nano",
     "sketch": "ECheckList_Client.ino",
-    "output": "E:\\Visual Code\\EcheckList_Stm32\\build",
+    "output": "C:\\Users\\phuoc\\Desktop\\ECheckList_Client\\build",
     "port": "COM3"
 }

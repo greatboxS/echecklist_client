@@ -59,6 +59,7 @@
 #define EEPROM_PERSON_ID 1
 #define EEPROM_MAC_ID 2
 #define EEPROM_SERVER_IP (EEPROM_MAC_ID + 6)
+#define EEPROM_SERVER_PORT 250
 #define EEPROM_ITEM_STATE_ID (EEPROM_SERVER_IP + 20) //begin of check item
 
 #define HC595_LAMP_1_ON 0x01

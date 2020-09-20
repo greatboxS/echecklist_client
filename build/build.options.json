@@ -1,11 +1,12 @@
 {
-  "additionalFiles": "..,..,..,..,..,..\\..\\..,..\\..\\..,..\\..\\..,..\\..\\..,..\\..\\..,..\\..\\..,..\\..\\..,..\\..\\..\\..\\..,..\\..\\..\\..\\..,..\\..\\..\\..\\..,..\\..\\..\\..\\..,..\\..\\..\\..\\..,..\\..\\..\\..\\..,..\\..\\..\\..\\..,..\\..\\..\\..\\..\\..\\..,..\\..\\..\\..\\..,..\\..\\..",
-  "builtInLibrariesFolders": "F:\\Arduino\\libraries",
-  "customBuildProperties": "build.path=E:\\Visual Code\\EcheckList_Stm32\\build,build.warn_data_percentage=75,runtime.tools.CMSIS.path=C:\\Users\\Dell-PC\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\CMSIS\\5.5.1,runtime.tools.CMSIS-5.5.1.path=C:\\Users\\Dell-PC\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\CMSIS\\5.5.1,runtime.tools.arm-none-eabi-gcc.path=C:\\Users\\Dell-PC\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\arm-none-eabi-gcc\\8.2.1-1.7,runtime.tools.arm-none-eabi-gcc-8.2.1-1.7.path=C:\\Users\\Dell-PC\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\arm-none-eabi-gcc\\8.2.1-1.7,runtime.tools.STM32Tools.path=C:\\Users\\Dell-PC\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\STM32Tools\\1.3.1,runtime.tools.STM32Tools-1.3.1.path=C:\\Users\\Dell-PC\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\STM32Tools\\1.3.1",
+  "additionalFiles": "..,..,..,..,..,..,..\\..\\..,..\\..\\..,..\\..\\..,..\\..\\..,..\\..\\..,..\\..\\..,..\\..\\..,..\\..\\..,..\\..\\..",
+  "builtInLibrariesFolders": "C:\\Program Files (x86)\\Arduino\\libraries",
+  "builtInToolsFolders": "C:\\Program Files (x86)\\Arduino\\tools-builder,C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr,C:\\Users\\phuoc\\AppData\\Local\\Arduino15\\packages",
+  "compiler.optimization_flags": "",
+  "customBuildProperties": "build.path=C:\\Users\\phuoc\\Desktop\\ECheckList_Client\\build,build.warn_data_percentage=75,runtime.tools.CMSIS.path=C:\\Users\\phuoc\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\CMSIS\\5.5.1,runtime.tools.CMSIS-5.5.1.path=C:\\Users\\phuoc\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\CMSIS\\5.5.1,runtime.tools.xpack-arm-none-eabi-gcc.path=C:\\Users\\phuoc\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\xpack-arm-none-eabi-gcc\\9.2.1-1.1,runtime.tools.xpack-arm-none-eabi-gcc-9.2.1-1.1.path=C:\\Users\\phuoc\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\xpack-arm-none-eabi-gcc\\9.2.1-1.1,runtime.tools.STM32Tools.path=C:\\Users\\phuoc\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\STM32Tools\\1.4.0,runtime.tools.STM32Tools-1.4.0.path=C:\\Users\\phuoc\\AppData\\Local\\Arduino15\\packages\\STM32\\tools\\STM32Tools\\1.4.0",
   "fqbn": "STM32:stm32:GenF1:pnum=BLUEPILL_F103C8,upload_method=swdMethod,xserial=generic,usb=none,xusb=FS,opt=osstd,rtlib=nano",
-  "hardwareFolders": "F:\\Arduino\\hardware,C:\\Users\\Dell-PC\\AppData\\Local\\Arduino15\\packages",
-  "otherLibrariesFolders": "C:\\Users\\Dell-PC\\Documents\\Arduino\\libraries",
-  "runtime.ide.version": "10810",
-  "sketchLocation": "e:\\Visual Code\\EcheckList_Stm32\\ECheckLib.h",
-  "toolsFolders": "F:\\Arduino\\tools-builder,F:\\Arduino\\hardware\\tools\\avr,C:\\Users\\Dell-PC\\AppData\\Local\\Arduino15\\packages"
+  "hardwareFolders": "C:\\Program Files (x86)\\Arduino\\hardware,C:\\Users\\phuoc\\AppData\\Local\\Arduino15\\packages",
+  "otherLibrariesFolders": "C:\\Users\\phuoc\\Documents\\Arduino\\libraries",
+  "runtime.ide.version": "10813",
+  "sketchLocation": "c:\\Users\\phuoc\\Desktop\\ECheckList_Client\\ECheckList_Client.ino"
 }
